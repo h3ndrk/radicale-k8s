@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: radicale
+  namespace: radicale
+  annotations:
+    # certmanager.k8s.io/cluster-issuer: letsencrypt-prod
+    kubernetes.io/ingress.class: nginx
+    nginx.ingress.kubernetes.io/auth-type: basic
+    nginx.ingress.kubernetes.io/auth-secret: radicale/basic-auth
+    nginx.ingress.kubernetes.io/configuration-snippet: |-
+      proxy_set_header X-Remote-User $remote_user;
+spec:
+  # tls:
+  # - hosts:
+  #   - example.com
+  #   secretName: example-com-tls
+  rules:
+  - host: example.com
+    http:
+      paths:
+      - path: /
+        backend:
+          serviceName: radicale
+          servicePort: dav

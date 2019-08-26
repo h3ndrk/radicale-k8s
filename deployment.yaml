@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: radicale
+  namespace: radicale
+  labels:
+    app: radicale
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: radicale
+  template:
+    metadata:
+      labels:
+        app: radicale
+    spec:
+      containers:
+      - name: radicale
+        image: tomsquest/docker-radicale:amd64
+        imagePullPolicy: IfNotPresent
+        ports:
+        - name: dav
+          containerPort: 5232
+          protocol: TCP
+        volumeMounts:
+        - name: collections
+          mountPath: /data/collections
+        - name: config
+          mountPath: /config/config
+          subPath: config
+          readOnly: true
+      restartPolicy: Always
+      volumes:
+      - name: collections
+        persistentVolumeClaim:
+          claimName: radicale-collections-pvc
+      - name: config
+        configMap:
+          name: config
